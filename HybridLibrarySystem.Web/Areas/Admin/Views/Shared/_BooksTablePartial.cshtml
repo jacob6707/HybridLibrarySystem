@@ -1,0 +1,29 @@
+﻿@model ICollection<Book>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Publication Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model?.Any() ?? true)
+        {
+            <tr>
+                <td colspan="2">No books found for this author.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var book in Model ?? [])
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.PublishedDate.ToShortDateString()</td>
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>

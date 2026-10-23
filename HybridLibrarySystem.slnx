@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="HybridLibrarySystem.ClientApp/HybridLibrarySystem.ClientApp.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="HybridLibrarySystem.Core/HybridLibrarySystem.Core.csproj" Id="cf66b671-8519-4905-bd8b-c0535a13b7c4" />
+  <Project Path="HybridLibrarySystem.Data/HybridLibrarySystem.Data.csproj" Id="81c81163-4ff5-4cb1-ba6e-e39c3a610ba5" />
+  <Project Path="HybridLibrarySystem.Web/HybridLibrarySystem.Web.csproj" />
+</Solution>

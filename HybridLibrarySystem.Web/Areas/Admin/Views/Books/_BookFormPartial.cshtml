@@ -1,0 +1,42 @@
+﻿@model BookFormViewModel
+<input type="hidden" asp-for="Book.Id" />
+<div class="form-group">
+    <label asp-for="Book.Title" class="control-label"></label>
+    <input asp-for="Book.Title" class="form-control" />
+    <span asp-validation-for="Book.Title" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Book.ISBN" class="control-label"></label>
+    <input asp-for="Book.ISBN" class="form-control" />
+    <span asp-validation-for="Book.ISBN" class="text-danger"></span>
+</div>
+
+<!-- Select with dropdown for authors and categories, with options to create new ones -->
+<div class="form-group">
+    <label asp-for="Book.AuthorId" class="control-label"></label>
+    <select asp-for="Book.AuthorId" class="form-control" asp-items="Model.Authors">
+        <option value="">-- Select Author --</option>
+    </select>
+    <span asp-validation-for="Book.AuthorId" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Book.CategoryId" class="control-label"></label>
+    <select asp-for="Book.CategoryId" class="form-control" asp-items="Model.Categories">
+        <option value="">-- Select Category --</option>
+    </select>
+    <span asp-validation-for="Book.CategoryId" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Book.PublishedDate" class="control-label"></label>
+    <input asp-for="Book.PublishedDate" class="form-control" />
+    <span asp-validation-for="Book.PublishedDate" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Book.CopiesAvailable" class="control-label"></label>
+    <input asp-for="Book.CopiesAvailable" class="form-control" />
+    <span asp-validation-for="Book.CopiesAvailable" class="text-danger"></span>
+</div>

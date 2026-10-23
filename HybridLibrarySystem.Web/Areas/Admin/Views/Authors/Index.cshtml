@@ -1,0 +1,46 @@
+﻿@model IEnumerable<AuthorSummary>
+@{
+    ViewData["Title"] = "Authors";
+}
+
+<h1>Authors</h1>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Biography</th>
+            <th>Date of Birth</th>
+            <th>Nationality</th>
+            <th>Number of Books</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center">No authors found.</td>
+            </tr>
+        }
+        @foreach (var author in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@author.Id">@author.Name</a>
+                </td>
+                <td>@author.Biography</td>
+                <td>@author.DateOfBirth.ToShortDateString()</td>
+                <td>@author.Nationality</td>
+                <td>@author.BookCount</td>
+                <td>
+                    <a asp-area="Admin" asp-controller="Authors" asp-action="Edit" asp-route-id="@author.Id" class="btn btn-primary">Edit</a>
+                    <a asp-area="Admin" asp-controller="Authors" asp-action="Delete" asp-route-id="@author.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
