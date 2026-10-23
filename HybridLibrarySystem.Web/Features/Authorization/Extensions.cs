@@ -16,48 +16,32 @@ public static class Extensions
             var logger = services.GetRequiredService<ILogger<Program>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-            var adminRole = await roleManager.FindByNameAsync(Roles.Admin);
-            if (adminRole is null)
-            {
-                logger.LogInformation("Creating role: {Role}", Roles.Admin);
-                await roleManager.CreateAsync(adminRole = new IdentityRole(Roles.Admin));
-
-                foreach (var permission in Permissions.GetPermissions())
-                {
-                    await roleManager.AddClaimAsync(adminRole, new Claim(CustomClaimTypes.Permission, permission));
-                }
-            }
-            var librarianRole = await roleManager.FindByNameAsync(Roles.Librarian);
-            if (librarianRole is null)
-            {
-                logger.LogInformation("Creating role: {Role}", Roles.Librarian);
-                await roleManager.CreateAsync(librarianRole = new IdentityRole(Roles.Librarian));
-
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.CreateAuthor));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.UpdateAuthor));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadAuthor));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.DeleteAuthor));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.CreateBook));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.UpdateBook));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadBook));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.DeleteBook));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.CreateCategory));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.UpdateCategory));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadCategory));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.DeleteCategory));
-                await roleManager.AddClaimAsync(librarianRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadMember));
-            }
-            var memberRole = await roleManager.FindByNameAsync(Roles.Member);
-            if (memberRole is null)
-            {
-                logger.LogInformation("Creating role: {Role}", Roles.Member);
-                await roleManager.CreateAsync(memberRole = new IdentityRole(Roles.Member));
-
-                await roleManager.AddClaimAsync(memberRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadBook));
-                await roleManager.AddClaimAsync(memberRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadAuthor));
-                await roleManager.AddClaimAsync(memberRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadCategory));
-                await roleManager.AddClaimAsync(memberRole, new Claim(CustomClaimTypes.Permission, Permissions.ReadMember));
-            }
+            await EnsureRolePermissionsAsync(roleManager, logger, Roles.Admin, Permissions.GetPermissions());
+            await EnsureRolePermissionsAsync(roleManager, logger, Roles.Librarian,
+            [
+                Permissions.CreateAuthor,
+                Permissions.UpdateAuthor,
+                Permissions.ReadAuthor,
+                Permissions.DeleteAuthor,
+                Permissions.CreateBook,
+                Permissions.UpdateBook,
+                Permissions.ReadBook,
+                Permissions.DeleteBook,
+                Permissions.ReserveBook,
+                Permissions.CreateCategory,
+                Permissions.UpdateCategory,
+                Permissions.ReadCategory,
+                Permissions.DeleteCategory,
+                Permissions.ReadMember
+            ]);
+            await EnsureRolePermissionsAsync(roleManager, logger, Roles.Member,
+            [
+                Permissions.ReadBook,
+                Permissions.ReserveBook,
+                Permissions.ReadAuthor,
+                Permissions.ReadCategory,
+                Permissions.ReadMember
+            ]);
             if (!await userManager.Users.AnyAsync())
             {
                 logger.LogInformation("Creating default admin user");
@@ -77,12 +61,33 @@ public static class Extensions
         }
     }
     
+    private static async Task EnsureRolePermissionsAsync(RoleManager<IdentityRole> roleManager, ILogger logger, string roleName, IEnumerable<string> permissions)
+    {
+        var role = await roleManager.FindByNameAsync(roleName);
+        if (role is null)
+        {
+            logger.LogInformation("Creating role: {Role}", roleName);
+            role = new IdentityRole(roleName);
+            await roleManager.CreateAsync(role);
+        }
+
+        var existing = (await roleManager.GetClaimsAsync(role))
+            .Where(c => c.Type == CustomClaimTypes.Permission)
+            .Select(c => c.Value)
+            .ToHashSet();
+        foreach (var permission in permissions.Where(p => !existing.Contains(p)))
+        {
+            logger.LogInformation("Granting permission {Permission} to role {Role}", permission, roleName);
+            await roleManager.AddClaimAsync(role, new Claim(CustomClaimTypes.Permission, permission));
+        }
+    }
+
     public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
     {
         var builder = services.AddAuthorizationBuilder();
-        foreach (var Permission in Permissions.GetPermissions())
+        foreach (var permission in Permissions.GetPermissions())
         {
-            builder.AddPolicy(Permission, policy => policy.RequireClaim(CustomClaimTypes.Permission, Permission));
+            builder.AddPolicy(permission, policy => policy.RequireClaim(CustomClaimTypes.Permission, permission));
         }
         return services;
     }

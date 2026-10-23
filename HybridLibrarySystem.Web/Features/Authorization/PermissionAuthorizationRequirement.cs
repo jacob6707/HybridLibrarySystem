@@ -1,24 +1,22 @@
 ﻿using HybridLibrarySystem.Core.Model.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-namespace HybridLibrarySystem.Web.Features.Authorization
+namespace HybridLibrarySystem.Web.Features.Authorization;
+public class PermissionAuthorizationRequirement(params string[] allowedPermissions) : IAuthorizationRequirement
 {
-    public class PermissionAuthorizationRequirement(params string[] allowedPermissions) : AuthorizationHandler<PermissionAuthorizationRequirement>, IAuthorizationRequirement
-    {
-        public string[] AllowedPermissions { get; } = allowedPermissions;
+  public string[] AllowedPermissions { get; } = allowedPermissions;
+}
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionAuthorizationRequirement requirement)
-        {
-            foreach (var permission in requirement.AllowedPermissions)
-            {
-                bool found = context.User.FindFirst(c => c.Type == CustomClaimTypes.Permission && c.Value == permission) is not null;
-                if (found)
-                {
-                    context.Succeed(requirement);
-                    break;
-                }
-            }
-            return Task.CompletedTask;
-        }
+public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionAuthorizationRequirement>
+{
+  protected override Task HandleRequirementAsync(
+    AuthorizationHandlerContext context, PermissionAuthorizationRequirement requirement)
+  {
+    if (requirement.AllowedPermissions.Any(p =>
+          context.User.HasClaim(CustomClaimTypes.Permission, p)))
+    {
+      context.Succeed(requirement);
     }
+    return Task.CompletedTask;
+  }
 }

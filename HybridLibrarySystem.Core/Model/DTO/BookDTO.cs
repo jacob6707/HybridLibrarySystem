@@ -10,5 +10,6 @@ public record BookDTO(
     CategoryDTO? Category,
     [DataType(DataType.Date), Display(Name = "Publication Date")]
     DateTime PublishedDate,
-    int CopiesAvailable
+    int CopiesAvailable,
+    bool IsReservedByMe = false
 );

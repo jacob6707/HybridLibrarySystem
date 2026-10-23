@@ -1,5 +1,7 @@
 ﻿using HybridLibrarySystem.Core.Interface;
 using HybridLibrarySystem.Core.Model;
+using HybridLibrarySystem.Core.Model.Authorization;
+using HybridLibrarySystem.Web.Features.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +11,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
     public class CategoriesController(ICategoryRepository dbCategories) : Controller
     {
         // GET: CategoriesController
+        [RequirePermission(Permissions.ReadCategory)]
         public async Task<IActionResult> Index()
         {
             var categories = await dbCategories.GetAllCategoriesAsync();
@@ -16,6 +19,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: CategoriesController/Details/5
+        [RequirePermission(Permissions.ReadCategory)]
         public async Task<IActionResult> Details(int id)
         {
             var category = await dbCategories.GetCategoryWithBooksByIdAsync(id);
@@ -27,6 +31,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: CategoriesController/Create
+        [RequirePermission(Permissions.CreateCategory)]
         public IActionResult Create()
         {
             return View();
@@ -35,6 +40,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: CategoriesController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.CreateCategory)]
         public async Task<IActionResult> Create(IFormCollection collection)
         {
             try
@@ -59,6 +65,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: CategoriesController/Edit/5
+        [RequirePermission(Permissions.UpdateCategory)]
         public async Task<IActionResult> Edit(int id)
         {
             var category = await dbCategories.GetCategoryByIdAsync(id);
@@ -72,6 +79,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: CategoriesController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.UpdateCategory)]
         public async Task<ActionResult> Edit(int id, IFormCollection collection)
         {
             try
@@ -98,6 +106,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: CategoriesController/Delete/5
+        [RequirePermission(Permissions.DeleteCategory)]
         public async Task<IActionResult> Delete(int id)
         {
             var category = await dbCategories.GetCategoryWithBooksByIdAsync(id);
@@ -111,6 +120,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: CategoriesController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.DeleteCategory)]
         public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
             try

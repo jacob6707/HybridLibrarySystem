@@ -1,5 +1,7 @@
 ﻿using HybridLibrarySystem.Core.Interface;
 using HybridLibrarySystem.Core.Model;
+using HybridLibrarySystem.Core.Model.Authorization;
+using HybridLibrarySystem.Web.Features.Authorization;
 using HybridLibrarySystem.Web.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,9 +9,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace HybridLibrarySystem.Web.Controllers.Admin
 {
     [Area("Admin")]
-    public class BooksController(IBookRepository dbBooks, IAuthorRepository dbAuthors, ICategoryRepository dbCategories) : Controller
+    public class BooksController(IBookRepository dbBooks, IAuthorRepository dbAuthors, ICategoryRepository dbCategories, IReservationRepository dbReservations) : Controller
     {
         // GET: BooksController
+        [RequirePermission(Permissions.ReadBook,Permissions.CreateBook)]
         public async Task<IActionResult> Index()
         {
             var books = await dbBooks.GetAllBooksAsync();
@@ -17,6 +20,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: BooksController/Details/5
+        [RequirePermission(Permissions.ReadBook,Permissions.CreateBook)]
         public async Task<IActionResult> Details(int id)
         {
             var book = await dbBooks.GetBookByIdAsync(id);
@@ -28,6 +32,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: BooksController/Create
+        [RequirePermission(Permissions.CreateBook)]
         public async Task<IActionResult> Create()
         {
             var authors = await dbAuthors.GetAllAuthorsAsync();
@@ -44,6 +49,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: BooksController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.CreateBook)]
         public async Task<IActionResult> Create(IFormCollection collection)
         {
             try
@@ -73,6 +79,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: BooksController/Edit/5
+        [RequirePermission(Permissions.UpdateBook)]
         public async Task<IActionResult> Edit(int id)
         {
             var book = await dbBooks.GetBookByIdAsync(id);
@@ -94,6 +101,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: BooksController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.UpdateBook)]
         public async Task<IActionResult> Edit(int id, IFormCollection collection)
         {
             try
@@ -125,6 +133,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: BooksController/Delete/5
+        [RequirePermission(Permissions.DeleteBook)]
         public async Task<IActionResult> Delete(int id)
         {
             var book = await dbBooks.GetBookByIdAsync(id);
@@ -134,8 +143,14 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: BooksController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.DeleteBook)]
         public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
+            if (await dbReservations.BookHasReservationsAsync(id))
+            {
+                TempData["Error"] = $"Book with ID {id} has active reservations and cannot be deleted.";
+                return RedirectToAction(nameof(Index));
+            }
             try
             {
                 var deleted = await dbBooks.DeleteBookAsync(id);

@@ -11,6 +11,7 @@ public static class Permissions
     public const string ReadBook = "book:read";
     public const string UpdateBook = "book:update";
     public const string DeleteBook = "book:delete";
+    public const string ReserveBook = "book:reserve";
 
     public const string CreateMember = "member:create";
     public const string ReadMember = "member:read";

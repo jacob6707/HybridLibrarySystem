@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using HybridLibrarySystem.Web.Api.Middleware;
 using HybridLibrarySystem.Core.Model.Authorization;
 using HybridLibrarySystem.Web.Features.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("LibraryContext") ?? throw new InvalidOperationException("Connection string 'LibraryContext' not found.");
@@ -17,12 +18,38 @@ builder.Services.AddDataServices(options =>
     options.UseSqlServer(connectionString);
     //options.LogTo(Console.WriteLine, minimumLevel: LogLevel.Trace);
 });
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<LibraryContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Matches the key lengths used by the existing AddIdentity migration.
+    options.Stores.MaxLengthForKeys = 128;
+}).AddEntityFrameworkStores<LibraryContext>().AddDefaultTokenProviders();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddAuthorizationPolicies();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.LoginPath = "/Identity/Account/Login";
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        }
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
 });
 
 // Add services to the container.

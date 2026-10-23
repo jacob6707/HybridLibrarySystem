@@ -18,6 +18,7 @@ public static class DependencyInjection
         services.AddScoped<IBookRepository, BookRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IAuthorRepository, AuthorRepository>();
+        services.AddScoped<IReservationRepository, ReservationRepository>();
         return services;
     }
     public static IServiceCollection AddDataServices(this IServiceCollection services, Action<DbContextOptionsBuilder> dbConfig)
@@ -27,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IBookRepository, BookRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IAuthorRepository, AuthorRepository>();
+        services.AddScoped<IReservationRepository, ReservationRepository>();
         return services;
     }
 }

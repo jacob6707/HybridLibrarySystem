@@ -11,6 +11,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
     public class AuthorsController(IAuthorRepository dbAuthors) : Controller
     {
         // GET: AuthorsController
+        [RequirePermission(Permissions.ReadAuthor)]
         public async Task<IActionResult> Index()
         {
             var authors = await dbAuthors.GetAuthorSummariesAsync();
@@ -18,6 +19,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: AuthorsController/Details/5
+        [RequirePermission(Permissions.ReadAuthor)]
         public async Task<ActionResult> Details(int id)
         {
             var author = await dbAuthors.GetAuthorWithBooksByIdAsync(id);
@@ -64,6 +66,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: AuthorsController/Edit/5
+        [RequirePermission(Permissions.UpdateAuthor)]
         public async Task<IActionResult> Edit(int id)
         {
             var author = await dbAuthors.GetAuthorByIdAsync(id);
@@ -73,6 +76,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: AuthorsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.UpdateAuthor)]
         public async Task<IActionResult> Edit(int id, IFormCollection collection)
         {
             try
@@ -103,6 +107,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         }
 
         // GET: AuthorsController/Delete/5
+        [RequirePermission(Permissions.DeleteAuthor)]
         public async Task<IActionResult> Delete(int id)
         {
             var author = await dbAuthors.GetAuthorWithBooksByIdAsync(id);
@@ -112,6 +117,7 @@ namespace HybridLibrarySystem.Web.Controllers.Admin
         // POST: AuthorsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequirePermission(Permissions.DeleteAuthor)]
         public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
             try

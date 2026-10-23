@@ -9,10 +9,24 @@ namespace HybridLibrarySystem.Data
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<Reservation>(entity =>
+            {
+                entity.HasIndex(r => new { r.BookId, r.UserId }).IsUnique();
+                entity.HasOne(r => r.Book)
+                    .WithMany()
+                    .HasForeignKey(r => r.BookId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(r => r.User)
+                    .WithMany()
+                    .HasForeignKey(r => r.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
             builder.Entity<ApplicationUser>(entity =>
             {

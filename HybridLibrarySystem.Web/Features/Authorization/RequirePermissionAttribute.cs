@@ -3,10 +3,10 @@
 namespace HybridLibrarySystem.Web.Features.Authorization;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
-public class RequirePermissionAttribute: AuthorizeAttribute
+public class RequirePermissionAttribute : AuthorizeAttribute
 {
-    public RequirePermissionAttribute(params string[] permissions)
-        : base(policy: string.Join(",", permissions))
-    {
-    }
+  public const string Prefix = "Permissions:";
+
+  public RequirePermissionAttribute(params string[] permissions)
+    => Policy = Prefix + string.Join(",", permissions);
 }
