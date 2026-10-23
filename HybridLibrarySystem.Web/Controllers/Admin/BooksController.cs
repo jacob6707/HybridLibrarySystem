@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace HybridLibrarySystem.Web.Controllers.Admin
 {
     [Area("Admin")]
-    public class BooksController(IBookRepository dbBooks, IAuthorRepository dbAuthors, ICategoryRepository dbCategories, IReservationRepository dbReservations) : Controller
+    [RequirePermission(Permissions.CreateAuthor)]
+  public class BooksController(IBookRepository dbBooks, IAuthorRepository dbAuthors, ICategoryRepository dbCategories, IReservationRepository dbReservations) : Controller
     {
         // GET: BooksController
         [RequirePermission(Permissions.ReadBook,Permissions.CreateBook)]

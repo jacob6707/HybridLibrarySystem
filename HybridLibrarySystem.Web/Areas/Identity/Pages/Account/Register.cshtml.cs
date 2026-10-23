@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using HybridLibrarySystem.Core.Model;
+using HybridLibrarySystem.Core.Model.Authorization;
 
 namespace HybridLibrarySystem.Web.Areas.Identity.Pages.Account;
 
@@ -120,6 +121,7 @@ public class RegisterModel : PageModel
 
             if (result.Succeeded)
             {
+              await _userManager.AddToRoleAsync(user, Roles.Member);
                 _logger.LogInformation("User created a new account with password.");
 
                 var userId = await _userManager.GetUserIdAsync(user);

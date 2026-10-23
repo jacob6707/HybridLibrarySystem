@@ -12,7 +12,7 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionAut
   protected override Task HandleRequirementAsync(
     AuthorizationHandlerContext context, PermissionAuthorizationRequirement requirement)
   {
-    if (requirement.AllowedPermissions.Any(p =>
+    if (requirement.AllowedPermissions.All(p =>
           context.User.HasClaim(CustomClaimTypes.Permission, p)))
     {
       context.Succeed(requirement);

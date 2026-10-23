@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HybridLibrarySystem.Web.Controllers.Admin
 {
     [Area("Admin")]
+    [RequirePermission(Permissions.CreateAuthor)]
     public class AuthorsController(IAuthorRepository dbAuthors) : Controller
     {
         // GET: AuthorsController

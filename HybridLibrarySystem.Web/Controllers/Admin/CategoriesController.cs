@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace HybridLibrarySystem.Web.Controllers.Admin
 {
     [Area("Admin")]
-    public class CategoriesController(ICategoryRepository dbCategories) : Controller
+    [RequirePermission(Permissions.CreateAuthor)]
+  public class CategoriesController(ICategoryRepository dbCategories) : Controller
     {
         // GET: CategoriesController
         [RequirePermission(Permissions.ReadCategory)]
